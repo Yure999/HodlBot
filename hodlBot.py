@@ -1,12 +1,11 @@
 import pandas
-# import sqlalchemy
-import json
 import asyncio
 from binance.client import Client
 from binance import BinanceSocketManager
 from binance import AsyncClient, DepthCacheManager, BinanceSocketManager
 
 import credentials
+import dbManager
 
 
 class HodlBot:
@@ -14,16 +13,18 @@ class HodlBot:
         self.client = AsyncClient(credentials.api_key, credentials.api_secret)
         self.socket_manager = BinanceSocketManager(self.client)
         self.socket = self.socket_manager.trade_socket("BTCUSDT")
+        self.db_manager = dbManager.DbManager()
 
     def start_loading_information(self):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.__fetch_data())
 
     async def __fetch_data(self):
-        await self.socket.__aenter__()
-        response = await self.socket.recv()
-        # do something useful with this
-        print(self.__map_response(response))
+        while True:
+            await self.socket.__aenter__()
+            response = await self.socket.recv()
+            result = self.__map_response(response)
+            self.db_manager.save_data(result)
 
     def __map_response(self, response):
         data = pandas.DataFrame([response])
