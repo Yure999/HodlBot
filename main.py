@@ -2,8 +2,8 @@ import hodlBot
 
 
 def main():
-    bot = hodlBot.hodl_bot()
-    bot.fetch_data()
+    bot = hodlBot.HodlBot()
+    bot.start_loading_information()
 
 
 main()
