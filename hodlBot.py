@@ -1,5 +1,8 @@
 import pandas
 import asyncio
+import datetime
+from datetime import datetime
+import numpy as np
 from binance.client import Client
 from binance import BinanceSocketManager
 from binance import AsyncClient, DepthCacheManager, BinanceSocketManager
@@ -20,11 +23,13 @@ class HodlBot:
         loop.run_until_complete(self.__fetch_data())
 
     async def __fetch_data(self):
-        while True:
-            await self.socket.__aenter__()
-            response = await self.socket.recv()
-            result = self.__map_response(response)
-            self.db_manager.save_data(result)
+        await self.socket.__aenter__()
+        response = await self.socket.recv()
+        result = self.__map_response(response)
+        #print(result.Symbol + " " + result.Price.astype(str) + "$")
+        self.print_data(result)
+
+    # self.db_manager.save_data(result)
 
     def __map_response(self, response):
         data = pandas.DataFrame([response])
@@ -40,3 +45,12 @@ class HodlBot:
         results.Price = results.Price.astype(float)
         results.Time = pandas.to_datetime(results.Time, unit="ms")
         return results
+
+    def show_btc_db_data(self):
+        self.db_manager.read_btc_data()
+
+    def print_data(self, data):
+        symbol = data.Symbol.values
+        price = data.Price.astype(str).values
+        string = symbol + " " + price + "$"
+        print(string)

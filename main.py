@@ -1,9 +1,12 @@
 import hodlBot
+from time import sleep
 
 
 def main():
     bot = hodlBot.HodlBot()
-    bot.start_loading_information()
+    while True:
+        sleep(2)
+        bot.start_loading_information()
 
 
 main()
